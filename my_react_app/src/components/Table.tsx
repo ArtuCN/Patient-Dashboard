@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import type { Patient } from "../models/Patient";
 import { ApiService } from "../services/Api";
+import { renderCellValue, sortByKey } from "../utils/tableUtils";
+import AlarmIndicator from "./AlarmIndicator.tsx";
+import FullPatientInfo from "./FullPatientInfo.tsx";
 
 export default function TableComponent()
 {
@@ -9,6 +12,7 @@ export default function TableComponent()
     const [patients, setPatients] = useState<Patient[]>([]);
     const [sortKey, setSortKey] = useState<string | null>(null);
     const [sortAsc, setSortAsc] = useState<boolean>(true);
+    const [selectedPatientId, setSelectedPatientId] = useState<number | null>(null);
 
     useEffect(() =>
     {
@@ -17,6 +21,7 @@ export default function TableComponent()
             try
             {
                 const data = await apiService.fetchPatientsList();
+                console.log("Dati pazienti caricati:", data);  
                 setPatients(data);
             }
             catch (error)
@@ -27,7 +32,11 @@ export default function TableComponent()
         fetchData();
     }, []);
 
-    const columns = patients.length > 0 ? Object.keys(patients[0]) : [];
+    const columns = patients.length > 0 
+    ? Object.keys(patients[0]).filter((col) => col !== "parameters") 
+    : [];
+
+    console.log("selectedPatientId:", selectedPatientId);
 
     function handleOrderByColumn(col: string)
     {
@@ -42,37 +51,13 @@ export default function TableComponent()
         }
     }
 
-    function renderCellValue(val: any)
-    {
-        if (val === null || val === undefined) return "";
-        if (typeof val === "object") return JSON.stringify(val);
-        return val;
-    }
-
     const sortedPatients = React.useMemo(() =>
     {
         if (!sortKey)
         {
             return patients;
         }
-
-        return [...patients].sort((a, b) =>
-        {
-            const aVal = (a as any)[sortKey];
-            const bVal = (b as any)[sortKey];
-
-            if (aVal < bVal)
-            {
-                return sortAsc ? -1 : 1;
-            }
-
-            if (aVal > bVal)
-            {
-                return sortAsc ? 1 : -1;
-            }
-
-            return 0;
-        });
+        return sortByKey(patients, sortKey, sortAsc);
     }, [patients, sortKey, sortAsc]);
 
     return (
@@ -90,6 +75,7 @@ export default function TableComponent()
                                 </button>
                             </th>
                         ))}
+                        <th>Alarm</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -100,10 +86,16 @@ export default function TableComponent()
                             (
                                 <td key={col}>{renderCellValue((patient as any)[col])}</td>
                             ))}
+                            <AlarmIndicator parameters={patient.parameters} />
+                            <td>
+                                <button onClick={() => setSelectedPatientId(patient.id)}>Show Parameters</button>
+                            </td>
+
                         </tr>
                     ))}
                 </tbody>
             </table>
+            {selectedPatientId && <FullPatientInfo id={selectedPatientId} />}
         </>
     );
 }

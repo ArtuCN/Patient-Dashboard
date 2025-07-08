@@ -6,7 +6,7 @@ const AUTH_HEADER = 'Basic ' + btoa('test:TestMePlease!');
 
 export class ApiService
 {
-    constructor() {this.patients = []; this.parameters = []; console.log("maremma maiala");};
+    constructor() {this.patients = []; this.parameters = [];};
 
     private patients: Patient[]; 
     private parameters: Parameter[];
@@ -63,8 +63,10 @@ export class ApiService
 
     public async fetchPatientById( id: number ): Promise<Patient>
     {
-        const data: Patient = await this.fetchJson('Patient/Get/' + id.toString);
-
+        console.log('Fetch URL:', API_URL + id.toString());
+        const data: Patient = await this.fetchJson('Patient/Get/' + id.toString());
+        console.log('cerca');
+        console.log(data);
         return data as Patient;
     }
 
