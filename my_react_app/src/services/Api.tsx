@@ -6,7 +6,7 @@ const AUTH_HEADER = 'Basic ' + btoa('test:TestMePlease!');
 
 export class ApiService
 {
-    constructor() {this.patients = []; this.parameters = [];};
+    constructor() {this.patients = []; this.parameters = []; console.log("maremma maiala");};
 
     private patients: Patient[]; 
     private parameters: Parameter[];
