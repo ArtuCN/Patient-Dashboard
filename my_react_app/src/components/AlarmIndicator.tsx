@@ -12,7 +12,9 @@ const AlarmIndicator: React.FC<AlarmIndicatorProps> = ({ parameters }) =>
   return (
     <td>
       <span title={hasAlarm ? "Critic parameter is present" : "Ok"}>
-        {hasAlarm ? "🚨" : "✅"}
+        {
+          hasAlarm ? "🚨" : "✅"
+        }
       </span>
     </td>
   );

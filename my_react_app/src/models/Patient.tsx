@@ -13,3 +13,11 @@ export interface Patient {
   sex: string;
   parameters: Parameter[];
 }
+
+export interface CreationPatient {
+  familyName: string;
+  givenName: string;
+  birthDate: string;
+  sex: string;
+  parameters: Parameter[];
+}

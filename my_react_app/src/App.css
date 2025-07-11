@@ -42,3 +42,31 @@ thead {
   margin: 20px 0;
   color: #ffffff;
 }
+
+.add_patient {
+  border-color: aqua;
+  padding: 20px;
+  position: relative;
+}
+
+.add_patient .OpenCreation {
+  padding: 30px;
+  border: 1px solid #ffffff;
+  margin-top: 30px;
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #5715ad57;
+  border-radius: 40px;
+  font-weight: bold;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.CreationForm {
+  border: 1px solid #ffffff;
+  padding: 20px;
+  position: absolute;
+  margin-top: 10px;
+  background-color: #5715ad57;
+}

@@ -4,19 +4,16 @@ import { ApiService } from "../services/Api";
 import { renderCellValue, sortByKey } from "../utils/tableUtils";
 import AlarmIndicator from "./AlarmIndicator.tsx";
 import FullPatientInfo from "./FullPatientInfo.tsx";
-
-import styled from 'styled-components';
-
-
-
-
+import { date_converter } from "../utils/convertData.tsx";
+import { count_params } from "../utils/countParam.tsx";
+import CreatePatient from "./CreatePatient.tsx";
 export default function TableComponent()
 {
     const apiService = new ApiService();
-
     const [patients, setPatients] = useState<Patient[]>([]);
     const [sortKey, setSortKey] = useState<string | null>(null);
     const [sortAsc, setSortAsc] = useState<boolean>(true);
+    const [showCreatePatient, setShowCreatePatient] = useState(false);
     const [selectedPatientId, setSelectedPatientId] = useState<number | null>(null);
     useEffect(() =>
         {
@@ -89,8 +86,13 @@ export default function TableComponent()
                         <th>
                             Alarm
                         </th>
-                    </tr>
+                        <th>
+                            Number of Parameters
+                        </th>
+                        
 
+                    </tr>
+                        
                 </thead>
                 
                 <tbody>
@@ -99,12 +101,19 @@ export default function TableComponent()
                         <tr key={i}>
                             {columns.map((col) =>
                             (
-                                <td key={col}>{renderCellValue((patient as any)[col])}</td>
+                                <td key={col}>
+                                    {col === "birthDate" 
+                                        ? date_converter((patient as any)[col]) 
+                                        : renderCellValue((patient as any)[col])
+                                    }
+                                </td>
                             ))}
+                            
                             <AlarmIndicator parameters={patient.parameters} />
-                            <div className="showParameters">
-                                
-                            </div>
+                            
+                            <td>{count_params(patient)}</td>
+
+                            
                             <td> 
                                 <button onClick={() =>
                                     {
@@ -117,8 +126,13 @@ export default function TableComponent()
                 </tbody>
             </table>
         </div>
-            {selectedPatientId !== null && <FullPatientInfo id={selectedPatientId} />}
-
+        {selectedPatientId !== null && <FullPatientInfo id={selectedPatientId} />}
+        <div className="add_patient">
+            <button className="OpenCreation"onClick={() => setShowCreatePatient(!showCreatePatient)}>
+                Add a new patient
+            </button>
+            {showCreatePatient && <CreatePatient />}
+        </div>
         </>
     );
 }

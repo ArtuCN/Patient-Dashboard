@@ -1,5 +1,5 @@
 import React from "react";
-import type { Patient, Parameter } from '../models/Patient';
+import type { Patient, Parameter, CreationPatient } from '../models/Patient';
 
 const API_URL = 'https://mobile.digistat.it/CandidateApi/'
 const AUTH_HEADER = 'Basic ' + btoa('test:TestMePlease!');
@@ -54,10 +54,7 @@ export class ApiService
         const data: Patient[] = await this.fetchJson('Patient/GetList');
         this.patients = data;
         this.patientsNumber = data.length;
-
         this.parameters = data.flatMap(patient => patient.parameters || []);
-        console.log('patients: ', this.patients);
-        console.log('parameters: ', this.parameters);
         return data;
     }
 
@@ -70,11 +67,15 @@ export class ApiService
         return data as Patient;
     }
 
-    public async fetchAddPatient( patient: Patient): Promise<Patient>
-    {
-        const response = await this.postJson('Patient/Add', patient);
+    public async fetchAddPatient(patient: CreationPatient): Promise<Patient> {
+        this.patients = await this.fetchPatientsList();
+        const maxId = this.patients.length > 0 ? Math.max(...this.patients.map(p => p.id)) : 0;
+        const newId = maxId + 1;
+        const patientWithId = { ...patient, id: newId };
+        const response = await this.postJson('Patient/Add', patientWithId);
         return response as Patient;
     }
+
 
     public async fetchUpdatePatient( patient: Patient): Promise<Patient>
     {
