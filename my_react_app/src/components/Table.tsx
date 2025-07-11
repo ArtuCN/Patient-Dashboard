@@ -78,7 +78,8 @@ export default function TableComponent()
             
             const sortedPatients = React.useMemo(() => {
                 const filtered = filterPatients(patients, filters);
-                if (!sortKey) return filtered;
+                if (!sortKey) 
+                    return filtered;
                 return sortByKey(filtered, sortKey, sortAsc);
                 }, [patients, filterText, filterSex, filterMinAge, filterMaxAge, sortKey, sortAsc]);
 
@@ -87,7 +88,7 @@ export default function TableComponent()
             <div style={{ marginBottom: "20px", display: "flex", gap: "10px", alignItems: "center" }}>
                 <input
                     type="text"
-                    placeholder="Search by name or surname"
+                    placeholder="Search by first name or family name"
                     value={filterText}
                     onChange={(e) => setFilterText(e.target.value)}
                 />
@@ -114,14 +115,6 @@ export default function TableComponent()
             </div>
 
         <div className="Patient Table">
-            <div style={{ marginBottom: "20px" }}>
-                <input
-                    type="text"
-                    placeholder="Search by name or surname"
-                    value={filterText}
-                    onChange={(e) => setFilterText(e.target.value)}
-                />
-            </div>
             <table>
                 <thead>
                     
