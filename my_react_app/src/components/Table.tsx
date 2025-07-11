@@ -72,6 +72,8 @@ export default function TableComponent()
                     }, [patients, sortKey, sortAsc]);
                     return (
         <>
+        <div className="Patient Table">
+
             <table>
                 <thead>
                     
@@ -100,8 +102,10 @@ export default function TableComponent()
                                 <td key={col}>{renderCellValue((patient as any)[col])}</td>
                             ))}
                             <AlarmIndicator parameters={patient.parameters} />
-                            <td>
+                            <div className="showParameters">
                                 
+                            </div>
+                            <td> 
                                 <button onClick={() =>
                                     {
                                         setSelectedPatientId(patient.id);
@@ -112,6 +116,7 @@ export default function TableComponent()
                     ))}
                 </tbody>
             </table>
+        </div>
             {selectedPatientId !== null && <FullPatientInfo id={selectedPatientId} />}
 
         </>

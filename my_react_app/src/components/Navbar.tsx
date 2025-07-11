@@ -8,24 +8,26 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 
 const Navbar = () => {
   return (
-    <AppBar position="fixed">
-      <Toolbar>
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          Patient Dashboard
-        </Typography>
+    <div className='NavBar'>
+      <AppBar position="fixed">
+        <Toolbar>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            Patient Dashboard
+          </Typography>
 
-        <Box>
-          <IconButton
-            size="large"
-            edge="end"
-            color="inherit"
-            aria-label="account of current user"
-          >
-            <AccountCircle />
-          </IconButton>
-        </Box>
-      </Toolbar>
-    </AppBar>
+          <Box>
+            <IconButton
+              size="large"
+              edge="end"
+              color="inherit"
+              aria-label="account of current user"
+            >
+              <AccountCircle />
+            </IconButton>
+          </Box>
+        </Toolbar>
+      </AppBar>
+    </div>
   );
 };
 

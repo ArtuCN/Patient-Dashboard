@@ -58,9 +58,9 @@ const FullPatientInfo: React.FC<Props> = ({ id }) => {
     <div>
       {patient ? (
         <>
-          <h2>
+          <div className="NameInFullInfo">
             {patient.givenName} {patient.familyName}
-          </h2>
+          </div>
           <table>
             <thead>
               <tr>
