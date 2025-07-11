@@ -11,6 +11,11 @@ export default function CreatePatient() {
   const [sex, setSex] = useState("");
 
   const [message, setMessage] = useState<string | null>(null);
+  const [filterText, setFilterText] = useState("");
+    const [filterSex, setFilterSex] = useState("");
+    const [filterMinAge, setFilterMinAge] = useState<number | null>(null);
+    const [filterMaxAge, setFilterMaxAge] = useState<number | null>(null);
+
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();

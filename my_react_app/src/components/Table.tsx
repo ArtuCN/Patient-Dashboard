@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import type { Patient } from "../models/Patient";
+import type { Patient, Filters } from "../models/Patient";
 import { ApiService } from "../services/Api";
 import { renderCellValue, sortByKey } from "../utils/tableUtils";
 import AlarmIndicator from "./AlarmIndicator.tsx";
@@ -7,6 +7,8 @@ import FullPatientInfo from "./FullPatientInfo.tsx";
 import { date_converter } from "../utils/convertData.tsx";
 import { count_params } from "../utils/countParam.tsx";
 import CreatePatient from "./CreatePatient.tsx";
+import { filterPatients } from "../utils/filterPatients.tsx";
+
 export default function TableComponent()
 {
     const apiService = new ApiService();
@@ -15,6 +17,22 @@ export default function TableComponent()
     const [sortAsc, setSortAsc] = useState<boolean>(true);
     const [showCreatePatient, setShowCreatePatient] = useState(false);
     const [selectedPatientId, setSelectedPatientId] = useState<number | null>(null);
+    const [filterText, setFilterText] = useState("");
+    const [filterSex, setFilterSex] = useState<string>("");
+    const [filterMinAge, setFilterMinAge] = useState<number | null>(null);
+    const [filterMaxAge, setFilterMaxAge] = useState<number | null>(null);
+
+    
+
+    
+
+    const filters = {
+        text: filterText,
+        sex: filterSex,
+        minAge: filterMinAge,
+        maxAge: filterMaxAge,
+        };
+
     useEffect(() =>
         {
             async function fetchData()
@@ -22,7 +40,6 @@ export default function TableComponent()
                 try
                 {
                     const data = await apiService.fetchPatientsList();
-                    console.log("Dati pazienti caricati:", data);  
                     setPatients(data);
                 }
                 catch (error)
@@ -59,18 +76,52 @@ export default function TableComponent()
                 }
             }
             
-            const sortedPatients = React.useMemo(() =>
-                {
-                    if (!sortKey)
-                        {
-                            return patients;
-                        }
-                        return sortByKey(patients, sortKey, sortAsc);
-                    }, [patients, sortKey, sortAsc]);
-                    return (
-        <>
-        <div className="Patient Table">
+            const sortedPatients = React.useMemo(() => {
+                const filtered = filterPatients(patients, filters);
+                if (!sortKey) return filtered;
+                return sortByKey(filtered, sortKey, sortAsc);
+                }, [patients, filterText, filterSex, filterMinAge, filterMaxAge, sortKey, sortAsc]);
 
+            return (
+        <>
+            <div style={{ marginBottom: "20px", display: "flex", gap: "10px", alignItems: "center" }}>
+                <input
+                    type="text"
+                    placeholder="Search by name or surname"
+                    value={filterText}
+                    onChange={(e) => setFilterText(e.target.value)}
+                />
+
+                <select value={filterSex} onChange={(e) => setFilterSex(e.target.value)}>
+                <option value="">All Sexes</option>
+                <option value="M">Male</option>
+                <option value="F">Female</option>
+                </select>
+
+                <input
+                    type="number"
+                    placeholder="Min Age"
+                    value={filterMinAge ?? ""}
+                    onChange={(e) => setFilterMinAge(e.target.value ? parseInt(e.target.value) : null)}
+                />
+
+                <input
+                    type="number"
+                    placeholder="Max Age"
+                    value={filterMaxAge ?? ""}
+                    onChange={(e) => setFilterMaxAge(e.target.value ? parseInt(e.target.value) : null)}
+                />
+            </div>
+
+        <div className="Patient Table">
+            <div style={{ marginBottom: "20px" }}>
+                <input
+                    type="text"
+                    placeholder="Search by name or surname"
+                    value={filterText}
+                    onChange={(e) => setFilterText(e.target.value)}
+                />
+            </div>
             <table>
                 <thead>
                     

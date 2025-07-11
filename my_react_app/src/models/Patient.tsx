@@ -21,3 +21,10 @@ export interface CreationPatient {
   sex: string;
   parameters: Parameter[];
 }
+
+export interface Filters {
+  text: string;
+  sex: string;
+  minAge: number | null;
+  maxAge: number | null;
+}
