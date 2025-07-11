@@ -5,6 +5,11 @@ import { renderCellValue, sortByKey } from "../utils/tableUtils";
 import AlarmIndicator from "./AlarmIndicator.tsx";
 import FullPatientInfo from "./FullPatientInfo.tsx";
 
+import styled from 'styled-components';
+
+
+
+
 export default function TableComponent()
 {
     const apiService = new ApiService();
@@ -13,71 +18,79 @@ export default function TableComponent()
     const [sortKey, setSortKey] = useState<string | null>(null);
     const [sortAsc, setSortAsc] = useState<boolean>(true);
     const [selectedPatientId, setSelectedPatientId] = useState<number | null>(null);
-
     useEffect(() =>
-    {
-        async function fetchData()
         {
-            try
+            async function fetchData()
             {
-                const data = await apiService.fetchPatientsList();
-                console.log("Dati pazienti caricati:", data);  
-                setPatients(data);
+                try
+                {
+                    const data = await apiService.fetchPatientsList();
+                    console.log("Dati pazienti caricati:", data);  
+                    setPatients(data);
+                }
+                catch (error)
+                {
+                    console.error("Error loading patients:", error);
+                }
             }
-            catch (error)
-            {
-                console.error("Error loading patients:", error);
+            fetchData();
+        }, []);
+        
+        const columns = patients.length > 0 
+        ? Object.keys(patients[0]).filter((col) => col !== "parameters") 
+        : [];
+        
+
+        const columnLabel:Record<string,string> = {
+            id: "ID",
+            familyName: "First Name",
+            givenName: "Second Name",
+            birthDate: "Birthdate",
+            sex: "Sex",
+        }
+        
+        function handleOrderByColumn(col: string)
+        {
+            if (sortKey === col)
+                {
+                    setSortAsc(!sortAsc);
+                }
+                else
+                {
+                    setSortKey(col);
+                    setSortAsc(true);
+                }
             }
-        }
-        fetchData();
-    }, []);
-
-    const columns = patients.length > 0 
-    ? Object.keys(patients[0]).filter((col) => col !== "parameters") 
-    : [];
-
-    console.log("selectedPatientId:", selectedPatientId);
-
-    function handleOrderByColumn(col: string)
-    {
-        if (sortKey === col)
-        {
-            setSortAsc(!sortAsc);
-        }
-        else
-        {
-            setSortKey(col);
-            setSortAsc(true);
-        }
-    }
-
-    const sortedPatients = React.useMemo(() =>
-    {
-        if (!sortKey)
-        {
-            return patients;
-        }
-        return sortByKey(patients, sortKey, sortAsc);
-    }, [patients, sortKey, sortAsc]);
-
-    return (
+            
+            const sortedPatients = React.useMemo(() =>
+                {
+                    if (!sortKey)
+                        {
+                            return patients;
+                        }
+                        return sortByKey(patients, sortKey, sortAsc);
+                    }, [patients, sortKey, sortAsc]);
+                    return (
         <>
-            <div>Table:</div>
             <table>
                 <thead>
+                    
                     <tr>
-                        {columns.map((col) =>
-                        (
-                            <th key={col}>
-                                {col}{" "}
-                                <button onClick={() => handleOrderByColumn(col)}>
-                                    {sortKey === col ? (sortAsc ? "↑" : "↓") : "↕"}
-                                </button>
-                            </th>
+                        {columns.map((col) => (
+                        <th key={col}>
+                            {columnLabel[col] || col}{" "}
+                            <button onClick={() => handleOrderByColumn(col)}>
+                            {sortKey === col ? (sortAsc ? "↑" : "↓") : "↕"}
+                            </button>
+                        </th>
                         ))}
-                        <th>Alarm</th>
+                        <th>
+                            Alarm
+                        </th>
                     </tr>
+
                 </thead>
+                
                 <tbody>
                     {sortedPatients.map((patient, i) =>
                     (
@@ -88,14 +101,19 @@ export default function TableComponent()
                             ))}
                             <AlarmIndicator parameters={patient.parameters} />
                             <td>
-                                <button onClick={() => setSelectedPatientId(patient.id)}>Show Parameters</button>
+                                
+                                <button onClick={() =>
+                                    {
+                                        setSelectedPatientId(patient.id);
+                                    }}>Show Parameters</button>
                             </td>
 
                         </tr>
                     ))}
                 </tbody>
             </table>
-            {selectedPatientId && <FullPatientInfo id={selectedPatientId} />}
+            {selectedPatientId !== null && <FullPatientInfo id={selectedPatientId} />}
+
         </>
     );
 }

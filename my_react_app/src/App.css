@@ -40,3 +40,24 @@
 .read-the-docs {
   color: #888;
 }
+
+table {
+  margin: 100px;
+  border-collapse: collapse;
+  width: 100%;
+  background-color: rgba(82, 9, 82, 0.137);
+  border: 1px solid rgb(0, 0, 0);
+}
+
+th,
+td {
+  border: 1px solid rgb(0, 0, 0);
+  padding: 10px;
+  text-align: left;
+  color: white; 
+}
+
+thead {
+  background-color: #5715ad57;
+}
+
