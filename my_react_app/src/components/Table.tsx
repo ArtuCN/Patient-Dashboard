@@ -8,7 +8,7 @@ import { date_converter } from "../utils/convertData.tsx";
 import { count_params } from "../utils/countParam.tsx";
 import CreatePatient from "./CreatePatient.tsx";
 import { filterPatients } from "../utils/filterPatients.tsx";
-
+import ModifyPatient from "./ModifyPatient.tsx";
 export default function TableComponent()
 {
     const apiService = new ApiService();
@@ -21,7 +21,7 @@ export default function TableComponent()
     const [filterSex, setFilterSex] = useState<string>("");
     const [filterMinAge, setFilterMinAge] = useState<number | null>(null);
     const [filterMaxAge, setFilterMaxAge] = useState<number | null>(null);
-
+    const [patientToModify, setPatientToModify] = useState<number | null> (null);
     
 
     
@@ -164,6 +164,12 @@ export default function TableComponent()
                                         setSelectedPatientId(patient.id);
                                     }}>Show Parameters</button>
                             </td>
+                            <td> 
+                                <button onClick={() =>
+                                    {
+                                        setPatientToModify(patient.id);
+                                    }}>Edit Patient</button>
+                            </td>
 
                         </tr>
                     ))}
@@ -171,6 +177,7 @@ export default function TableComponent()
             </table>
         </div>
         {selectedPatientId !== null && <FullPatientInfo id={selectedPatientId} />}
+        {patientToModify !== null && <ModifyPatient id={patientToModify}/>}
         <div className="add_patient">
             <button className="OpenCreation"onClick={() => setShowCreatePatient(!showCreatePatient)}>
                 Add a new patient

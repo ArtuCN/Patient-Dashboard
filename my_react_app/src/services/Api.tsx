@@ -42,7 +42,18 @@ export class ApiService
         });
         if (!res.ok)
             throw new Error(`POST ${endpoint} failed: ${res.status} ${res.statusText}`);
-        return res.json();
+
+        const text = await res.text();
+
+        if (!text) {
+        return null;
+        }
+
+        try {
+        return JSON.parse(text);
+        } catch (e) {
+        throw new Error(`Failed to parse JSON response from ${endpoint}: ${e.message}`);
+        }
     }
 
     public GetPatients(): Patient[] { return this.patients; }
@@ -60,9 +71,7 @@ export class ApiService
 
     public async fetchPatientById( id: number ): Promise<Patient>
     {
-        console.log('Fetch URL:', API_URL + id.toString());
         const data: Patient = await this.fetchJson('Patient/Get/' + id.toString());
-        console.log('cerca');
         console.log(data);
         return data as Patient;
     }
@@ -79,7 +88,9 @@ export class ApiService
 
     public async fetchUpdatePatient( patient: Patient): Promise<Patient>
     {
+        console.log(" patient: ", patient);
         const response = await this.postJson('Patient/Update', patient);
+        console.log("response ", response, " patient: ", patient);
         return response as Patient;
     }
 
