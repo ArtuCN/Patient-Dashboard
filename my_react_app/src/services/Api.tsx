@@ -52,7 +52,7 @@ export class ApiService
         try {
         return JSON.parse(text);
         } catch (e) {
-        throw new Error(`Failed to parse JSON response from ${endpoint}: ${e.message}`);
+        throw new Error(`Failed to parse JSON response from ${endpoint}`);
         }
     }
 

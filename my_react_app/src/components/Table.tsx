@@ -22,9 +22,21 @@ export default function TableComponent()
     const [filterMinAge, setFilterMinAge] = useState<number | null>(null);
     const [filterMaxAge, setFilterMaxAge] = useState<number | null>(null);
     const [patientToModify, setPatientToModify] = useState<number | null> (null);
-    
+    const refreshPatients = async () => {
+    try {
+        const data = await apiService.fetchPatientsList();
+        setPatients(data);
+    } catch (error) {
+        console.error("Error loading patients:", error);
+    }
+    };
 
-    
+    useEffect(() => {
+    refreshPatients();
+    }, []);
+
+    type PatientKey = "id" | "familyName" | "givenName" | "birthDate" | "sex";
+
 
     const filters = {
         text: filterText,
@@ -33,60 +45,48 @@ export default function TableComponent()
         maxAge: filterMaxAge,
         };
 
-    useEffect(() =>
-        {
-            async function fetchData()
-            {
-                try
-                {
-                    const data = await apiService.fetchPatientsList();
-                    setPatients(data);
-                }
-                catch (error)
-                {
-                    console.error("Error loading patients:", error);
-                }
-            }
-            fetchData();
-        }, []);
         
         const columns = patients.length > 0 
         ? Object.keys(patients[0]).filter((col) => col !== "parameters") 
         : [];
-        
 
-        const columnLabel:Record<string,string> = {
+        const extraColumns = ["paramCount", "alarm"];
+
+        const allColumns = [...columns, ...extraColumns];
+
+        const columnLabel: Record<string,string> = {
             id: "ID",
             familyName: "First Name",
             givenName: "Second Name",
             birthDate: "Birthdate",
             sex: "Sex",
-        }
+            paramCount: "Number of Parameters",
+            alarm: "Alarm",
+        };
         
-        function handleOrderByColumn(col: string)
-        {
-            if (sortKey === col)
-                {
-                    setSortAsc(!sortAsc);
-                }
-                else
-                {
-                    setSortKey(col);
-                    setSortAsc(true);
-                }
+        function handleOrderByColumn(col: string) {
+            if (sortKey === col) {
+                setSortAsc(!sortAsc);
+            } else {
+                setSortKey(col);
+                setSortAsc(true);
             }
+        }
+
             
             const sortedPatients = React.useMemo(() => {
                 const filtered = filterPatients(patients, filters);
-                if (!sortKey) 
-                    return filtered;
+                if (!sortKey) return filtered;
                 return sortByKey(filtered, sortKey, sortAsc);
                 }, [patients, filterText, filterSex, filterMinAge, filterMaxAge, sortKey, sortAsc]);
 
+
             return (
         <>
-            <div style={{ marginBottom: "20px", display: "flex", gap: "10px", alignItems: "center" }}>
+            <div className= "filters">
+                <th>Filter table:</th>
                 <input
+                    
                     type="text"
                     placeholder="Search by first name or family name"
                     value={filterText}
@@ -119,70 +119,63 @@ export default function TableComponent()
                 <thead>
                     
                     <tr>
-                        {columns.map((col) => (
+                        {allColumns.map((col) => (
                         <th key={col}>
                             {columnLabel[col] || col}{" "}
                             <button onClick={() => handleOrderByColumn(col)}>
                             {sortKey === col ? (sortAsc ? "↑" : "↓") : "↕"}
                             </button>
                         </th>
-                        ))}
-                        <th>
-                            Alarm
-                        </th>
-                        <th>
-                            Number of Parameters
-                        </th>
-                        
+                        ))}                        
 
                     </tr>
                         
                 </thead>
-                
-                <tbody>
-                    {sortedPatients.map((patient, i) =>
-                    (
+                    <tbody>
+                    {sortedPatients.map((patient, i) => (
                         <tr key={i}>
-                            {columns.map((col) =>
-                            (
-                                <td key={col}>
-                                    {col === "birthDate" 
-                                        ? date_converter((patient as any)[col]) 
-                                        : renderCellValue((patient as any)[col])
-                                    }
+                        {allColumns.map((col) => {
+                            if (col === "birthDate") {
+                            return <td key={col}>{date_converter(patient[col])}</td>;
+                            }
+                            if (col === "paramCount") {
+                            return <td key={col}>{count_params(patient)}</td>;
+                            }
+                            if (col === "alarm") {
+                            // Qui usa direttamente il contenuto, NON AlarmIndicator perché fa già un <td>
+                            const hasAlarmFlag = patient.parameters?.some(p => p.alarm) ?? false;
+                            return (
+                                <td key={col} title={hasAlarmFlag ? "Critic parameter is present" : "Ok"}>
+                                {hasAlarmFlag ? "🚨" : "✅"}
                                 </td>
-                            ))}
-                            
-                            <AlarmIndicator parameters={patient.parameters} />
-                            
-                            <td>{count_params(patient)}</td>
+                            );
+                            }
+                            return <td key={col}>{renderCellValue(patient[col as PatientKey])
+}</td>;
+                        })}
 
-                            
-                            <td> 
-                                <button onClick={() =>
-                                    {
-                                        setSelectedPatientId(patient.id);
-                                    }}>Show Parameters</button>
-                            </td>
-                            <td> 
-                                <button onClick={() =>
-                                    {
-                                        setPatientToModify(patient.id);
-                                    }}>Edit Patient</button>
-                            </td>
-
+                        <td>
+                            <button onClick={() => setSelectedPatientId(patient.id)}>Show Parameters</button>
+                            <button onClick={() => setPatientToModify(patient.id)}>Edit Patient</button>
+                        </td>
                         </tr>
                     ))}
-                </tbody>
+</tbody>
+
             </table>
         </div>
+        {selectedPatientId !== null && (
+        <button className="CloseShowParameters" onClick={() => setSelectedPatientId(null)}>
+            Close Show Parameters
+        </button>
+        )}
         {selectedPatientId !== null && <FullPatientInfo id={selectedPatientId} />}
         {patientToModify !== null && <ModifyPatient id={patientToModify}/>}
         <div className="add_patient">
             <button className="OpenCreation"onClick={() => setShowCreatePatient(!showCreatePatient)}>
                 Add a new patient
             </button>
-            {showCreatePatient && <CreatePatient />}
+            {showCreatePatient && <CreatePatient onPatientCreated={refreshPatients} />}
         </div>
         </>
     );

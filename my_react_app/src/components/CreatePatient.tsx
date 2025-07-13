@@ -2,7 +2,11 @@ import React, { useState } from "react";
 import type { CreationPatient } from "../models/Patient";
 import { ApiService } from "../services/Api";
 
-export default function CreatePatient() {
+
+interface CreatePatientProps {
+  onPatientCreated: () => void;
+}
+export default function CreatePatient({ onPatientCreated }: CreatePatientProps) {
   const apiService = new ApiService();
 
   const [familyName, setFamilyName] = useState("");
@@ -11,6 +15,7 @@ export default function CreatePatient() {
   const [sex, setSex] = useState("");
 
   const [message, setMessage] = useState<string | null>(null);
+  
   
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -25,9 +30,10 @@ export default function CreatePatient() {
 
     try {
       await apiService.fetchAddPatient(newPatient);
-      setMessage("Paziente creato con successo!");
+      onPatientCreated();
+      setMessage("Patient created successfully!");
     } catch (error) {
-      setMessage("Errore durante la creazione del paziente.");
+      setMessage("Error");
       console.error(error);
     }
   }

@@ -1,20 +1,17 @@
 import React from "react";
-
 import type { Parameter } from "../models/Patient";
+import { hasAlarm } from "../utils/hasAlarm";
 
 interface AlarmIndicatorProps {
   parameters: Parameter[] | undefined;
 }
 
-const AlarmIndicator: React.FC<AlarmIndicatorProps> = ({ parameters }) =>
-{
-  const hasAlarm = (parameters || []).some(p => p.alarm);
+const AlarmIndicator: React.FC<AlarmIndicatorProps> = ({ parameters }) => {
+  const alarm = hasAlarm(parameters);
   return (
     <td>
-      <span title={hasAlarm ? "Critic parameter is present" : "Ok"}>
-        {
-          hasAlarm ? "🚨" : "✅"
-        }
+      <span title={alarm ? "Critic parameter is present" : "Ok"}>
+        {alarm ? "🚨" : "✅"}
       </span>
     </td>
   );
