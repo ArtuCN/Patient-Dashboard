@@ -13,13 +13,17 @@ export default function CreatePatient({ onPatientCreated }: CreatePatientProps) 
   const [givenName, setGivenName] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [sex, setSex] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
 
   const [message, setMessage] = useState<string | null>(null);
   
   
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-
+     if (isSubmitting) return;
+  
+    setIsSubmitting(true);
     const newPatient: CreationPatient = {
       familyName,
       givenName,
@@ -35,11 +39,14 @@ export default function CreatePatient({ onPatientCreated }: CreatePatientProps) 
     } catch (error) {
       setMessage("Error");
       console.error(error);
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
   return (
     <form className="CreationForm" onSubmit={handleSubmit}>
+      <label className="TitleCreation">Patient Creation Form</label>
       <div>
         <label>Family Name:</label>
         <input
@@ -79,7 +86,14 @@ export default function CreatePatient({ onPatientCreated }: CreatePatientProps) 
         </select>
       </div>
 
-      <button type="submit" className="submit-button">Create Patient</button>
+      <button
+        type="submit"
+        className="submit-button"
+        disabled={isSubmitting}
+        >
+          {isSubmitting ? "Creating..." : "Create Patient"}
+        </button>
+
 
 
       {message && <p>{message}</p>}

@@ -9,6 +9,10 @@ import { count_params } from "../utils/countParam.tsx";
 import CreatePatient from "./CreatePatient.tsx";
 import { filterPatients } from "../utils/filterPatients.tsx";
 import ModifyPatient from "./ModifyPatient.tsx";
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import EditIcon from '@mui/icons-material/Edit';
+import AddIcon from '@mui/icons-material/Add';
+
 export default function TableComponent()
 {
     const apiService = new ApiService();
@@ -22,6 +26,8 @@ export default function TableComponent()
     const [filterMinAge, setFilterMinAge] = useState<number | null>(null);
     const [filterMaxAge, setFilterMaxAge] = useState<number | null>(null);
     const [patientToModify, setPatientToModify] = useState<number | null> (null);
+    const [showFilters, setShowFilters] = useState<boolean>(false);
+
     const refreshPatients = async () => {
     try {
         const data = await apiService.fetchPatientsList();
@@ -83,8 +89,12 @@ export default function TableComponent()
 
             return (
         <>
+                <button className="showFilters" onClick={() => setShowFilters(!showFilters)}>
+                    {showFilters ? "Filters" : "Filters"}
+                </button>
+            {showFilters && (
             <div className= "filters">
-                <th>Filter table:</th>
+                <th className="FilterTitle">Filter table:</th>
                 <input
                     
                     type="text"
@@ -113,6 +123,7 @@ export default function TableComponent()
                     onChange={(e) => setFilterMaxAge(e.target.value ? parseInt(e.target.value) : null)}
                 />
             </div>
+           )}
 
         <div className="Patient Table">
             <table>
@@ -127,7 +138,7 @@ export default function TableComponent()
                             </button>
                         </th>
                         ))}                        
-
+                        <th>Actions</th>
                     </tr>
                         
                 </thead>
@@ -150,30 +161,34 @@ export default function TableComponent()
                                 </td>
                             );
                             }
-                            return <td key={col}>{renderCellValue(patient[col as PatientKey])
-}</td>;
+                            return <td key={col}>{renderCellValue(patient[col as PatientKey]) }</td>;
                         })}
 
-                        <td>
-                            <button onClick={() => setSelectedPatientId(patient.id)}>Show Parameters</button>
-                            <button onClick={() => setPatientToModify(patient.id)}>Edit Patient</button>
+                        <td className="actions">
+                            <button className="eye" onClick={() => setSelectedPatientId(patient.id)}>
+                                <VisibilityIcon />
+                            </button>
+                            <button className="pen" onClick={() => setPatientToModify(patient.id)}>
+                                <EditIcon />
+                            </button>
                         </td>
+
                         </tr>
-                    ))}
-</tbody>
+                    ))} 
+                </tbody>
 
             </table>
         </div>
         {selectedPatientId !== null && (
         <button className="CloseShowParameters" onClick={() => setSelectedPatientId(null)}>
-            Close Show Parameters
+            Hide Patient #{selectedPatientId} Parameters
         </button>
         )}
         {selectedPatientId !== null && <FullPatientInfo id={selectedPatientId} />}
         {patientToModify !== null && <ModifyPatient id={patientToModify}/>}
         <div className="add_patient">
             <button className="OpenCreation"onClick={() => setShowCreatePatient(!showCreatePatient)}>
-                Add a new patient
+                <AddIcon />
             </button>
             {showCreatePatient && <CreatePatient onPatientCreated={refreshPatients} />}
         </div>

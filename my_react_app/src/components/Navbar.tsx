@@ -9,7 +9,7 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 const Navbar = () => {
   return (
     <div className='NavBar'>
-      <AppBar position="fixed">
+      <AppBar position="fixed" sx={{ backgroundColor: '#5715ad' }}>
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Patient Dashboard
