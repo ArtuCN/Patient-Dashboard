@@ -4,9 +4,10 @@ import { ApiService } from "../services/Api";
 import { formatDateForInput } from "../utils/convertData";
 interface Props {
   id: number;
+  onClose: () => void; 
 }
 
-const ModifyPatient: React.FC<Props> = ({ id }) => {
+const ModifyPatient: React.FC<Props> = ({ id, onClose }) => {
     const apiservice = new ApiService();
     const [patient, setPatient] = useState<Patient | null>(null);
     const [familyName, setFamilyName] = useState("");
@@ -63,6 +64,15 @@ const ModifyPatient: React.FC<Props> = ({ id }) => {
     
     return (
         <form className="UpdateForm" onSubmit={handleSubmit}>
+        <button 
+        type="button" 
+        className="close-button" 
+        onClick={onClose}
+        aria-label="Close form"
+      >
+        ✖
+      </button>
+      <label className="ModificationTitle">Modification Form </label>
       <div>
         <label>Family Name </label>
         <input

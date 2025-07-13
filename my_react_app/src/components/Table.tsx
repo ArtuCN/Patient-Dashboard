@@ -27,6 +27,7 @@ export default function TableComponent()
     const [filterMaxAge, setFilterMaxAge] = useState<number | null>(null);
     const [patientToModify, setPatientToModify] = useState<number | null> (null);
     const [showFilters, setShowFilters] = useState<boolean>(false);
+    const handleCloseModify = () => setPatientToModify(null);
 
     const refreshPatients = async () => {
     try {
@@ -185,7 +186,13 @@ export default function TableComponent()
         </button>
         )}
         {selectedPatientId !== null && <FullPatientInfo id={selectedPatientId} />}
-        {patientToModify !== null && <ModifyPatient id={patientToModify}/>}
+        {patientToModify !== null && (
+        <ModifyPatient
+            id={patientToModify}
+            onClose={() => setPatientToModify(null)}
+        />
+        )}
+
         <div className="add_patient">
             <button className="OpenCreation"onClick={() => setShowCreatePatient(!showCreatePatient)}>
                 <AddIcon />
